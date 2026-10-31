@@ -1,4 +1,4 @@
-
+#include "keyboard.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <limine.h>
@@ -56,6 +56,23 @@ void kmain(void) {
     console_write("\n");
     console_write("SYSTEM CONSOLE\n");
     console_write("> ");
+
+	keyboard_init();
+
+	for (;;) {
+	    int c = keyboard_getchar();
+
+	    if (c >= 0) {
+	        if (c == '\n') {
+	            console_putchar('\n');
+ 	           console_write("> ");
+ 	       } else {
+	            console_putchar((char)c);
+	        }
+	    }
+
+    	__asm__ volatile ("pause");
+    }
 
     halt();
 }
