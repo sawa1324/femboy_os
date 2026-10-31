@@ -1,0 +1,25 @@
+# Build artifacts
+*.iso
+*.o
+*.a
+*.elf
+
+# Kernel build output
+/kernel/build/
+
+# Downloaded Limine tools
+/tools/limine/
+/tools/limine-binary/
+/tools/limine-binary.tar.xz
+
+# Third-party template
+/third_party/limine-template/
+
+# Legacy Limine checkout
+/limine/
+
+# Generated ISO boot files
+/iso/femboy-os/EFI/BOOT/BOOTX64.EFI
+/iso/femboy-os/boot/kernel
+/iso/femboy-os/boot/limine/*.bin
+/iso/femboy-os/boot/limine/*.sys
