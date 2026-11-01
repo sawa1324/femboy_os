@@ -107,3 +107,37 @@ void framebuffer_scroll_up(uint64_t pixels, uint32_t color) {
         color
     );
 }
+
+void framebuffer_draw_grayscale(
+    uint64_t x,
+    uint64_t y,
+    uint64_t width,
+    uint64_t height,
+    const uint8_t *pixels,
+    uint64_t image_width,
+    uint64_t image_height
+) {
+    if (pixels == 0 || image_width == 0 || image_height == 0 ||
+        width == 0 || height == 0) {
+        return;
+    }
+
+    for (uint64_t py = 0; py < height; py++) {
+        for (uint64_t px = 0; px < width; px++) {
+            uint64_t sx = px * image_width / width;
+            uint64_t sy = py * image_height / height;
+
+            uint8_t shade = pixels[sy * image_width + sx];
+
+            if (shade == 0)
+                continue;
+
+            uint32_t color =
+                ((uint32_t)shade << 16) |
+                ((uint32_t)shade << 8) |
+                (uint32_t)shade;
+
+            framebuffer_put_pixel(x + px, y + py, color);
+        }
+    }
+}

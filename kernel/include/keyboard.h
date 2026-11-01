@@ -3,5 +3,6 @@
 
 void keyboard_init(void);
 int keyboard_getchar(void);
+int keyboard_read_scancode(void);
 
 #endif

@@ -29,4 +29,14 @@ uint64_t framebuffer_width(void);
 uint64_t framebuffer_height(void);
 void framebuffer_scroll_up(uint64_t pixels, uint32_t color);
 
+void framebuffer_draw_grayscale(
+    uint64_t x,
+    uint64_t y,
+    uint64_t width,
+    uint64_t height,
+    const uint8_t *pixels,
+    uint64_t image_width,
+    uint64_t image_height
+);
+
 #endif

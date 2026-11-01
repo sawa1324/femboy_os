@@ -1,9 +1,13 @@
 #include "keyboard.h"
+#include "shell.h"
+#include "timer.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <limine.h>
 #include "framebuffer.h"
 #include "console.h"
+
+#define INPUT_SIZE 256
 
 __attribute__((used, section(".limine_requests")))
 static volatile uint64_t base_revision[3] = LIMINE_BASE_REVISION(6);
@@ -27,53 +31,65 @@ static void halt(void) {
 }
 
 void kmain(void) {
-    if (!LIMINE_BASE_REVISION_SUPPORTED(base_revision)) {
+    if (!LIMINE_BASE_REVISION_SUPPORTED(base_revision))
         halt();
-    }
 
     if (framebuffer_request.response == NULL ||
-        framebuffer_request.response->framebuffer_count < 1) {
+        framebuffer_request.response->framebuffer_count < 1)
         halt();
-    }
 
     struct limine_framebuffer *fb =
         framebuffer_request.response->framebuffers[0];
 
-    if (!framebuffer_init(fb)) {
+    if (!framebuffer_init(fb))
         halt();
-    }
 
     console_init();
+    timer_init();
+    keyboard_init();
 
-    console_set_color(0xD88BC7, 0x10121C);
     console_write("FEMBOY OS\n");
 
-    console_set_color(0xE6E6F0, 0x10121C);
-    console_write("INSTALLER 0.0.1\n");
-    console_write("\n");
     console_write("KERNEL INITIALIZED\n");
-    console_write("FRAMEBUFFER READY\n");
-    console_write("\n");
-    console_write("SYSTEM CONSOLE\n");
+    console_write("FRAMEBUFFER READY\n\n");
+
+    shell_init();
+
+    char input[INPUT_SIZE];
+    size_t length = 0;
+
     console_write("> ");
 
-	keyboard_init();
+    for (;;) {
+        console_update_cursor();
 
-	for (;;) {
-	    int c = keyboard_getchar();
+        int c = keyboard_getchar();
 
-	    if (c >= 0) {
-	        if (c == '\n') {
-	            console_putchar('\n');
- 	           console_write("> ");
- 	       } else {
-	            console_putchar((char)c);
-	        }
-	    }
+        if (c < 0) {
+            __asm__ volatile ("pause");
+            continue;
+        }
 
-    	__asm__ volatile ("pause");
+        if (c == '\n') {
+            input[length] = '\0';
+            console_putchar('\n');
+
+            shell_handle_line(input);
+
+            length = 0;
+            console_write("> ");
+        }
+        else if (c == '\b') {
+            if (length > 0) {
+                length--;
+                console_putchar('\b');
+            }
+        }
+        else if (c >= 32 && c <= 126) {
+            if (length < INPUT_SIZE - 1) {
+                input[length++] = (char)c;
+                console_putchar((char)c);
+            }
+        }
     }
-
-    halt();
 }
-

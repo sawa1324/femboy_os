@@ -13,7 +13,7 @@ LDFLAGS = -nostdlib -static -no-pie \
           -Wl,-z,max-page-size=0x1000 \
           -Wl,-T,linker/x86_64.lds \
           -Wl,--build-id=none
-SOURCES = src/main.c src/framebuffer.c src/console.c src/font.c src/memory.c src/keyboard.c
+SOURCES = src/main.c src/framebuffer.c src/console.c src/font.c src/memory.c src/keyboard.c src/timer.c src/shell.c
 TARGET = build/kernel
 
 .PHONY: all clean
